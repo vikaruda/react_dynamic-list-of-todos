@@ -2,22 +2,44 @@ import React, { useEffect, useState } from 'react';
 import { getTodos } from '../../api';
 import { Todo } from '../../types/Todo';
 import classNames from 'classnames';
+import { Loader } from '../Loader';
 
-export const TodoList: React.FC = ({ message }) => {
+interface ForMessage {
+  message: (clickButton: boolean) => void;
+}
+
+export const TodoList: React.FC<ForMessage> = ({ message }) => {
   const [todosApi, setTodosFromApi] = useState<Todo[]>([]);
-  const [clickButton, setClickButton] = useState(false);
-  const error = clickButton === false;
+  const [loading, setLoading] = useState(true);
 
-  const handleClick = () => {
-    setClickButton(true);
-    message(clickButton);
+  const [clickButtonState, setClickButtonState] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  const handleClick = (id: number) => {
+    setClickButtonState(prevState => {
+      const newState = { ...prevState };
+
+      newState[id] = !newState[id];
+
+      return newState;
+    });
+    message(!clickButtonState[id]);
   };
 
   useEffect(() => {
     getTodos().then(data => setTodosFromApi(data));
+  }, [clickButtonState]);
+
+  useEffect(() => {
+    getTodos().then(() => {
+      setLoading(false);
+    });
   }, []);
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <table className="table is-narrow is-fullwidth">
       <thead>
         <tr>
@@ -37,7 +59,7 @@ export const TodoList: React.FC = ({ message }) => {
           <tr
             data-cy="todo"
             className={classNames('', {
-              'has-background-info-light': error,
+              'has-background-info-light': clickButtonState[item.id], // Використовуємо стан для конкретного елемента
             })}
             key={item.id}
           >
@@ -51,12 +73,13 @@ export const TodoList: React.FC = ({ message }) => {
                 data-cy="selectButton"
                 className="button"
                 type="button"
-                onClick={handleClick}
+                onClick={() => handleClick(item.id)}
               >
                 <span className="icon">
                   <i
-                    className={classNames('far fa-eye', {
-                      '-slash': error,
+                    className={classNames('far', {
+                      'fa-eye': !clickButtonState[item.id], // Стан для конкретного елемента
+                      'fa-eye-slash': clickButtonState[item.id],
                     })}
                   />
                 </span>
