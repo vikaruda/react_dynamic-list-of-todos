@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Loader } from '../Loader';
+import { getTodos } from '../../api';
 
 export const TodoModal: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [clickClose, setClickClose] = useState(false);
+
+  useEffect(() => {
+    getTodos().then(() => {
+      setLoading(true);
+    });
+  }, []);
+
   return (
     <div className="modal is-active" data-cy="modal">
       <div className="modal-background" />
 
-      {true ? (
+      {!loading && clickClose ? (
         <Loader />
       ) : (
         <div className="modal-card">
@@ -19,7 +29,12 @@ export const TodoModal: React.FC = () => {
             </div>
 
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-            <button type="button" className="delete" data-cy="modal-close" />
+            <button
+              type="button"
+              className="delete"
+              data-cy="modal-close"
+              onClick={() => setClickClose(true)}
+            />
           </header>
 
           <div className="modal-card-body">
