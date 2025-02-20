@@ -11,9 +11,10 @@ import { Todo } from './types/Todo';
 export const App: React.FC = () => {
   const [isModalOpened, setIsModalOpened] = useState(false);
   const [title, setTitle] = useState('');
+  const [id, setId] = useState<number[]>([]);
   const [filterTodos, setFilterTodos] = useState<Todo[]>([]);
 
-  const updateMessage = (message: boolean) => {
+  const handleMessageUpdate = (message: boolean) => {
     setIsModalOpened(message);
   };
 
@@ -30,8 +31,9 @@ export const App: React.FC = () => {
 
             <div className="block">
               <TodoList
-                message={updateMessage}
+                message={handleMessageUpdate}
                 setTitle={setTitle}
+                setId={setId}
                 filterTodos={filterTodos}
               />
             </div>
@@ -41,8 +43,9 @@ export const App: React.FC = () => {
 
       <TodoModal
         isModalOpened={isModalOpened}
-        message={updateMessage}
+        message={handleMessageUpdate}
         title={title}
+        id={id}
       />
     </>
   );

@@ -6,12 +6,14 @@ interface TodoModalProps {
   isModalOpened: boolean;
   message: (clickButton: boolean) => void;
   title: string;
+  id: number[];
 }
 
 export const TodoModal: React.FC<TodoModalProps> = ({
   isModalOpened,
   message,
   title,
+  id,
 }) => {
   const [loading, setLoading] = useState(true);
   const [hasClicked, setHasClicked] = useState(false);
@@ -43,7 +45,7 @@ export const TodoModal: React.FC<TodoModalProps> = ({
             className="modal-card-title has-text-weight-medium"
             data-cy="modal-header"
           >
-            Todo #2
+            Todo #{id}
           </div>
           <button
             type="button"

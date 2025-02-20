@@ -37,7 +37,7 @@ export const TodoFilter: React.FC<FilterTodosProps> = ({ setFilterTodos }) => {
     }
 
     setFilterTodos(filteredTodos);
-  }, [filter, formValue, todosApi]);
+  }, [filter, formValue, todosApi, setFilterTodos]);
 
   return (
     <form className="field has-addons">

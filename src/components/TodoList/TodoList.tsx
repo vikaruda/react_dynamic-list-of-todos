@@ -8,31 +8,29 @@ interface ForMessage {
   message: (clickButton: boolean) => void;
   setTitle: (title: string) => void;
   filterTodos: Todo[];
+  setId: (id: number[]) => void;
 }
 
 export const TodoList: React.FC<ForMessage> = ({
   message,
   setTitle,
   filterTodos,
+  setId,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [todosApi, setTodosFromApi] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [clickButtonState, setClickButtonState] = useState<{
     [key: number]: boolean;
   }>({});
 
   const handleClick = (id: number) => {
-    setClickButtonState(prevState => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-    message(!clickButtonState[id]);
-  };
+    setClickButtonState(prevState => {
+      const newState = { ...prevState, [id]: !prevState[id] };
 
-  useEffect(() => {
-    getTodos().then(data => setTodosFromApi(data));
-  }, []);
+      message(newState[id]);
+
+      return newState;
+    });
+  };
 
   useEffect(() => {
     getTodos().then(() => setLoading(false));
@@ -86,6 +84,7 @@ export const TodoList: React.FC<ForMessage> = ({
                 onClick={() => {
                   handleClick(todo.id);
                   setTitle(todo.title);
+                  setId([todo.id]);
                 }}
               >
                 <span className="icon">
