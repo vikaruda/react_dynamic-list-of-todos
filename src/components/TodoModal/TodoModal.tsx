@@ -5,19 +5,25 @@ import { getTodos } from '../../api';
 interface TodoModalProps {
   isModalOpened: boolean;
   message: (clickButton: boolean) => void;
+  title: string;
 }
 
 export const TodoModal: React.FC<TodoModalProps> = ({
   isModalOpened,
   message,
+  title,
 }) => {
   const [loading, setLoading] = useState(true);
+  const [hasClicked, setHasClicked] = useState(false);
 
   useEffect(() => {
-    getTodos().then(() => {
-      setLoading(false);
-    });
-  }, []);
+    if (isModalOpened) {
+      setHasClicked(true);
+      getTodos().then(() => {
+        setLoading(false);
+      });
+    }
+  }, [isModalOpened]);
 
   if (!isModalOpened) {
     return null;
@@ -25,6 +31,7 @@ export const TodoModal: React.FC<TodoModalProps> = ({
 
   const handleCloseClick = () => {
     message(false);
+    setHasClicked(false);
   };
 
   return (
@@ -46,12 +53,12 @@ export const TodoModal: React.FC<TodoModalProps> = ({
           />
         </header>
         <div className="modal-card-body">
-          {loading ? (
-            <Loader />
+          {hasClicked && loading ? (
+            <Loader /> // Показуємо loader тільки після кліку
           ) : (
             <>
               <p className="block" data-cy="modal-title">
-                quis ut nam facilis et officia qui
+                {title}
               </p>
               <p className="block" data-cy="modal-user">
                 <strong className="has-text-danger">Planned</strong>

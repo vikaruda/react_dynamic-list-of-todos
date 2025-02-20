@@ -6,35 +6,36 @@ import { Loader } from '../Loader';
 
 interface ForMessage {
   message: (clickButton: boolean) => void;
+  setTitle: (title: string) => void;
+  filterTodos: Todo[];
 }
 
-export const TodoList: React.FC<ForMessage> = ({ message }) => {
+export const TodoList: React.FC<ForMessage> = ({
+  message,
+  setTitle,
+  filterTodos,
+}) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [todosApi, setTodosFromApi] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [clickButtonState, setClickButtonState] = useState<{
     [key: number]: boolean;
   }>({});
 
   const handleClick = (id: number) => {
-    setClickButtonState(prevState => {
-      const newState = { ...prevState };
-
-      newState[id] = !newState[id];
-
-      return newState;
-    });
+    setClickButtonState(prevState => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
     message(!clickButtonState[id]);
   };
 
   useEffect(() => {
     getTodos().then(data => setTodosFromApi(data));
-  }, [clickButtonState]);
+  }, []);
 
   useEffect(() => {
-    getTodos().then(() => {
-      setLoading(false);
-    });
+    getTodos().then(() => setLoading(false));
   }, []);
 
   return loading ? (
@@ -55,31 +56,43 @@ export const TodoList: React.FC<ForMessage> = ({ message }) => {
       </thead>
 
       <tbody>
-        {todosApi.map(item => (
+        {filterTodos.map(todo => (
           <tr
-            data-cy="todo"
+            key={todo.id}
             className={classNames('', {
-              'has-background-info-light': clickButtonState[item.id], // Використовуємо стан для конкретного елемента
+              'has-background-info-light': clickButtonState[todo.id],
             })}
-            key={item.id}
           >
-            <td className="is-vcentered">{item.id}</td>
-            <td className="is-vcentered" />
+            <td className="is-vcentered">{todo.id}</td>
+            <td className="is-vcentered">
+              <span className="icon">
+                <i className={classNames({ 'fas fa-check': todo.completed })} />
+              </span>
+            </td>
             <td className="is-vcentered is-expanded">
-              <p className="has-text-danger">{item.title}</p>
+              <p
+                className={classNames({
+                  'has-text-danger': !todo.completed,
+                  'has-text-success': todo.completed,
+                })}
+              >
+                {todo.title}
+              </p>
             </td>
             <td className="has-text-right is-vcentered">
               <button
-                data-cy="selectButton"
                 className="button"
                 type="button"
-                onClick={() => handleClick(item.id)}
+                onClick={() => {
+                  handleClick(todo.id);
+                  setTitle(todo.title);
+                }}
               >
                 <span className="icon">
                   <i
                     className={classNames('far', {
-                      'fa-eye': !clickButtonState[item.id], // Стан для конкретного елемента
-                      'fa-eye-slash': clickButtonState[item.id],
+                      'fa-eye': !clickButtonState[todo.id],
+                      'fa-eye-slash': clickButtonState[todo.id],
                     })}
                   />
                 </span>

@@ -2,13 +2,16 @@
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
+import { useState } from 'react';
 import { TodoList } from './components/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { TodoModal } from './components/TodoModal';
-import { useState } from 'react';
+import { Todo } from './types/Todo';
 
 export const App: React.FC = () => {
   const [isModalOpened, setIsModalOpened] = useState(false);
+  const [title, setTitle] = useState('');
+  const [filterTodos, setFilterTodos] = useState<Todo[]>([]);
 
   const updateMessage = (message: boolean) => {
     setIsModalOpened(message);
@@ -22,17 +25,25 @@ export const App: React.FC = () => {
             <h1 className="title">Todos:</h1>
 
             <div className="block">
-              <TodoFilter />
+              <TodoFilter setFilterTodos={setFilterTodos} />
             </div>
 
             <div className="block">
-              <TodoList message={updateMessage} />
+              <TodoList
+                message={updateMessage}
+                setTitle={setTitle}
+                filterTodos={filterTodos}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <TodoModal isModalOpened={isModalOpened} message={updateMessage} />
+      <TodoModal
+        isModalOpened={isModalOpened}
+        message={updateMessage}
+        title={title}
+      />
     </>
   );
 };
